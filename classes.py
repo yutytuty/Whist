@@ -1,4 +1,5 @@
 import random
+import pygame
 
 new_player_order = None
 
@@ -7,27 +8,37 @@ class Card:
     def __init__(self, suit, value):
         self.suit = suit
         self.value = value
-        self.picture = None
+        self.image = None
         self.assign_picture()
+        self.image = pygame.transform.scale(self.image, (131, 200))
 
     def assign_picture(self):
         if self.value < 11:
-            self.picture = f"assets/{self.value}{self.suit[0]}.png"
+            self.image = pygame.image.load(f"assets/{self.value}{self.suit[0]}.png")
 
         if self.value == 11:
-            self.picture = f"assets/J{self.suit[0]}.png"
+            self.image = pygame.image.load(f"assets/J{self.suit[0]}.png")
 
         elif self.value == 12:
-            self.picture = f"assets/Q{self.suit[0]}.png"
+            self.image = pygame.image.load(f"assets/Q{self.suit[0]}.png")
 
         elif self.value == 13:
-            self.picture = f"assets/K{self.suit[0]}.png"
+            self.image = pygame.image.load(f"assets/K{self.suit[0]}.png")
 
         elif self.value == 14:
-            self.picture = f"assets/A{self.suit[0]}.png"
+            self.image = pygame.image.load(f"assets/A{self.suit[0]}.png")
 
     def __str__(self):
-        return f"{self.value} of {self.suit}"
+        if self.value < 11:
+            return f"{self.value} of {self.suit}"
+        elif self.value == 11:
+            return f"Jack of {self.suit}"
+        elif self.value == 12:
+            return f"Queen of {self.suit}"
+        elif self.value == 13:
+            return f"King of {self.suit}"
+        elif self.value == 14:
+            return f"Ace of {self.suit}"
 
 
 class Deck:
@@ -35,14 +46,20 @@ class Deck:
         self.cards = []
         self.build()
 
+    def draw(self):
+        return self.cards.pop()
+
     def show(self):
         for card in self.cards:
             print(card)
 
     def build(self):
-        for suit in ["Spades", "Diamonds", "Hearts", "Spades"]:
-            for value in range(1, 15):
+        for suit in ["Clubs", "Diamonds", "Hearts", "Spades"]:
+            for value in range(2, 15):
                 self.cards.append(Card(suit, value))
+
+    def shuffle(self):
+        random.shuffle(self.cards)
 
 
 class Player:
@@ -51,6 +68,14 @@ class Player:
         self.hand = []
         self.take_num = 0
         self.declaration = None
+
+    def show_hand(self):
+        for card in self.hand:
+            print(card)
+
+    def draw(self, deck, num):
+        for i in range(num):
+            self.hand.append(deck.draw())
 
     def sort_hand(self):
         def bubble_sort(arr):
@@ -91,17 +116,17 @@ class Player:
         for i in sorted_hand:
             bubble_sort(i)
 
-        self.hand = sum(sorted_hand)
+        self.hand = sum(sorted_hand, [])
 
-    def play_card(self, table, round_suit=None):
+    def play_card(self, table, card_id, round_suit=None):
         """
         plays a card onto the table
+        :param card_id: int
         :param table: table object
-        :param round_suit: string
-        :return: string (round_suit)
+        :param round_suit: string (Clubs or Spades or Diamonds or Hearts)
+        :return: int
         """
         round_suit = round_suit
-        card_id = int(input("card ID: "))
         card_suit = self.hand[card_id].suit
         if not round_suit:
             round_suit = self.hand[card_id].suit
@@ -110,16 +135,14 @@ class Player:
             suits = [i.suit for i in self.hand]
 
             if round_suit in suits:
-                # TODO: make pygame friendly
-                print(f"please play a card with a value of {round_suit}")
-                return self.play_card(table, round_suit)
+                return 0
 
             else:
                 table.on_table.append(self.hand.pop(card_id))
-                return round_suit
+                return 1
 
-        table.on_table.append(self.hand.pop(self.hand.pop(card_id)))
-        return round_suit
+        table.on_table.append(self.hand.pop(card_id))
+        return 1
 
 
 class Table:
