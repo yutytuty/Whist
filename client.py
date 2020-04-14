@@ -1,7 +1,9 @@
-import pygame
 from math import floor
 from classes import *
-from declarations import *
+import socket
+
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.connect((socket.gethostname(), 1234))
 
 pygame.init()
 

@@ -5,7 +5,8 @@ new_player_order = None
 
 
 class Card:
-    def __init__(self, suit, value):
+    def __init__(self, suit, value, address):
+        self.address = address
         self.suit = suit
         self.value = value
         self.image = None
@@ -118,7 +119,7 @@ class Player:
 
         self.hand = sum(sorted_hand, [])
 
-    def play_card(self, table, card_id, round_suit=None):
+    def play_card(self, table, card_id, server, round_suit=None):
         """
         plays a card onto the table
         :param card_id: int
@@ -138,7 +139,9 @@ class Player:
                 return 0
 
             else:
-                table.on_table.append(self.hand.pop(card_id))
+                card = self.hand.pop(card_id)
+                table.on_table.append(card)
+                server.sendall()
                 return 1
 
         table.on_table.append(self.hand.pop(card_id))
