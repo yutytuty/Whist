@@ -5,29 +5,27 @@ new_player_order = None
 
 
 class Card:
-    def __init__(self, suit, value, address):
-        self.address = address
+    def __init__(self, suit, value):
         self.suit = suit
         self.value = value
         self.image = None
         self.assign_picture()
-        self.image = pygame.transform.scale(self.image, (131, 200))
 
     def assign_picture(self):
         if self.value < 11:
-            self.image = pygame.image.load(f"assets/{self.value}{self.suit[0]}.png")
+            self.image = f"assets/{self.value}{self.suit[0]}.png"
 
         if self.value == 11:
-            self.image = pygame.image.load(f"assets/J{self.suit[0]}.png")
+            self.image = f"assets/J{self.suit[0]}.png"
 
         elif self.value == 12:
-            self.image = pygame.image.load(f"assets/Q{self.suit[0]}.png")
+            self.image = f"assets/Q{self.suit[0]}.png"
 
         elif self.value == 13:
-            self.image = pygame.image.load(f"assets/K{self.suit[0]}.png")
+            self.image = f"assets/K{self.suit[0]}.png"
 
         elif self.value == 14:
-            self.image = pygame.image.load(f"assets/A{self.suit[0]}.png")
+            self.image = f"assets/A{self.suit[0]}.png"
 
     def __str__(self):
         if self.value < 11:
@@ -45,7 +43,6 @@ class Card:
 class Deck:
     def __init__(self):
         self.cards = []
-        self.build()
 
     def draw(self):
         return self.cards.pop()
@@ -195,4 +192,5 @@ class Table:
             return new_player_order
 
 
+# players = [Player("Player 1"), Player("Player 2"), Player("Player 3"), Player("Player 4")]
 players = []

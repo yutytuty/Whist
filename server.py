@@ -1,26 +1,86 @@
 import socket
 import pickle
 from _thread import *
+from time import sleep
+from classes import *
 
+x = 100
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
 try:
-	server.bind((socket.gethostname(), 1234))
+	server.bind(("0.0.0.0", 1234))
 except socket.error as e:
 	str(e)
 
 server.listen(4)
 print("waiting for connections")
 
-
-class DataPackage:
-	def __init__(self, player, table):
-		self.hand = player.hand
-		self.on_table = table.on_table
-		self.turn = 0
+table = Table()
 
 
-def threaded_client(connection: socket.socket):
-	connection.send(str.encode("Connection established"))
+def input_thread(conn):
 	while True:
-		pass
+
+		card_index = conn.recv(10)
+		if card_index:
+			card_index = pickle.loads(card_index)
+			print(card_index)
+
+
+def threaded_client(conn: socket.socket, player_id):
+
+	players.append(Player("Player " + str(player_id)))
+	start_new_thread(input_thread, (conn, ))
+	players[player_id].draw(deck, 13)
+	players[player_id].sort_hand()
+	HEADERSIZE = 10
+
+	data = [[], []]
+	for card in players[player_id].hand:
+		data[0].append(card)
+	print(data[0])
+	z = data[0]
+	print(data)
+	data_send = pickle.dumps(z)
+	print (len(data_send))
+	data_send = bytes(f"{len(data_send):<{HEADERSIZE}}", 'utf-8')+data_send
+	print (data_send)
+	conn.send(data_send)
+
+
+client_num = 0
+connections = []
+while len(players) != 4:
+	connection, address = server.accept()
+	print("Connection established with: ", address)
+	client_num += 1
+
+	connections.append(connection)
+	players.append(Player("player " + str(client_num)))
+	# start_new_thread(threaded_client, (connection, client_num))
+
+deck = Deck()
+data = [[], []]
+HEADERSIZE = 10
+deck.build()
+deck.shuffle()
+
+while True:
+
+	for player in players:
+		player.draw(deck, 13)
+		print(player)
+		deck.show()
+
+	for i in range(13):
+		for player in players:
+			player.sort_hand()
+			for card in player.hand:
+				data[players.index(player)].append(card.image)
+
+			data_send = pickle.dumps(data[0])
+			data_send = bytes(f"{len(data_send):<{HEADERSIZE}}", 'utf-8') + data_send
+
+			connections[players.index(player)].send(data_send)
+			card_index = connections[players.index(player)].recv(20)
