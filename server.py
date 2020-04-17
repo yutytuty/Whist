@@ -71,16 +71,24 @@ while True:
 	for player in players:
 		player.draw(deck, 13)
 		print(player)
-		deck.show()
 
 	for i in range(13):
+		global data_send
 		for player in players:
 			player.sort_hand()
-			for card in player.hand:
-				data[players.index(player)].append(card.image)
 
-			data_send = pickle.dumps(data[0])
-			data_send = bytes(f"{len(data_send):<{HEADERSIZE}}", 'utf-8') + data_send
+			# data_send = pickle.dumps(data[0])
+			# data_send = bytes(f"{len(data_send):<{HEADERSIZE}}", 'utf-8') + data_send
 
-			connections[players.index(player)].send(data_send)
+			for j in range(len(connections)):
+				data = [[], []]
+				players[j].sort_hand()
+				for card in players[j].hand:
+					data[0].append(card.image)
+
+				print(data[0])
+				data_send = pickle.dumps(data[0])
+				data_send = bytes(f"{len(data_send):<{HEADERSIZE}}", "utf-8") + data_send
+
+				connections[j].send(data_send)
 			card_index = connections[players.index(player)].recv(20)
