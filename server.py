@@ -43,9 +43,9 @@ def threaded_client(conn: socket.socket, player_id):
 	z = data[0]
 	print(data)
 	data_send = pickle.dumps(z)
-	print (len(data_send))
+	print(len(data_send))
 	data_send = bytes(f"{len(data_send):<{HEADERSIZE}}", 'utf-8')+data_send
-	print (data_send)
+	print(data_send)
 	conn.send(data_send)
 
 
@@ -58,7 +58,6 @@ while len(players) != 4:
 
 	connections.append(connection)
 	players.append(Player("player " + str(client_num)))
-	# start_new_thread(threaded_client, (connection, client_num))
 
 deck = Deck()
 data = [[], []]
@@ -86,7 +85,6 @@ while True:
 				for card in players[j].hand:
 					data[0].append(card.image)
 
-				print(data[0])
 				data_send = pickle.dumps(data[0])
 				data_send = bytes(f"{len(data_send):<{HEADERSIZE}}", "utf-8") + data_send
 

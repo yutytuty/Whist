@@ -1,4 +1,3 @@
-import os
 import socket
 import pickle
 from _thread import *
@@ -28,7 +27,7 @@ def threaded_game():
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				pygame.quit()
-				exit(os.EX_OK)
+				exit()
 
 		screen.fill(white)
 		if data:
@@ -66,3 +65,10 @@ while True:
 			data = pickle.loads(full_msg[HEADERSIZE:])
 			new_msg = True
 			full_msg = b""
+			card_pressed = False
+			while not card_pressed:
+				mouse_pos = pygame.mouse.get_pos()
+				mouse_press = pygame.mouse.get_pressed()
+				if mouse_press == (1, 0, 0):
+					if mouse_pos[0] < len(data[0]) * 131 and mouse_pos[1] < screen_height - 200:
+						server.send()
