@@ -116,33 +116,24 @@ class Player:
 
         self.hand = sum(sorted_hand, [])
 
-    def play_card(self, table, card_id, server, round_suit=None):
-        """
-        plays a card onto the table
-        :param card_id: int
-        :param table: table object
-        :param round_suit: string (Clubs or Spades or Diamonds or Hearts)
-        :return: int
-        """
+    def play_card(self, table, card_id, round_suit=None):
         round_suit = round_suit
         card_suit = self.hand[card_id].suit
         if not round_suit:
             round_suit = self.hand[card_id].suit
 
-        elif round_suit != card_suit:
+        elif card_suit != round_suit:
             suits = [i.suit for i in self.hand]
-
             if round_suit in suits:
-                return 0
+                print(f"Please play a card with a suit of {round_suit}")
+                return self.play_card(table, round_suit)
 
             else:
-                card = self.hand.pop(card_id)
-                table.on_table.append(card)
-                server.sendall()
-                return 1
+                table.on_table.append(self.hand.pop(card_id))
+                return round_suit
 
         table.on_table.append(self.hand.pop(card_id))
-        return 1
+        return round_suit
 
 
 class Table:
